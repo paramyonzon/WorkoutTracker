@@ -79,9 +79,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getIntensity(duration) {
         if (duration === 0) return 0;
-        if (duration < 30) return 1;
-        if (duration < 60) return 2;
-        if (duration < 90) return 3;
+        if (duration <= 15) return 1;
+        if (duration <= 30) return 2;
+        if (duration <= 60) return 3;
         return 4;
     }
 
