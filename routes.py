@@ -65,11 +65,20 @@ def index():
 def strava_auth():
     client = Client()
     try:
-        client_id = int(os.environ['STRAVA_CLIENT_ID'])
+        client_id = os.environ['STRAVA_CLIENT_ID']
         client_secret = os.environ['STRAVA_CLIENT_SECRET']
-    except (KeyError, ValueError) as e:
-        logger.error(f"Error accessing Strava credentials: {str(e)}")
-        flash('Error accessing Strava credentials. Please contact the administrator.', 'error')
+        
+        # Ensure client_id is an integer
+        try:
+            client_id = int(client_id)
+        except ValueError:
+            logger.error(f"STRAVA_CLIENT_ID is not a valid integer: {client_id}")
+            flash('Invalid Strava client ID. Please contact the administrator.', 'error')
+            return redirect(url_for('index'))
+        
+    except KeyError as e:
+        logger.error(f"Missing Strava credentials: {str(e)}")
+        flash('Missing Strava credentials. Please contact the administrator.', 'error')
         return redirect(url_for('index'))
 
     redirect_uri = url_for('strava_callback', _external=True, _scheme='https')
