@@ -63,7 +63,6 @@ def index():
 @app.route('/strava_auth')
 @login_required
 def strava_auth():
-    client = Client()
     try:
         client_id = os.environ['STRAVA_CLIENT_ID']
         client_secret = os.environ['STRAVA_CLIENT_SECRET']
@@ -76,15 +75,10 @@ def strava_auth():
             flash('Invalid Strava client ID. Please contact the administrator.', 'error')
             return redirect(url_for('index'))
         
-    except KeyError as e:
-        logger.error(f"Missing Strava credentials: {str(e)}")
-        flash('Missing Strava credentials. Please contact the administrator.', 'error')
-        return redirect(url_for('index'))
-
-    redirect_uri = url_for('strava_callback', _external=True, _scheme='https')
-    logger.info(f"Redirect URI: {redirect_uri}")
-    
-    try:
+        redirect_uri = url_for('strava_callback', _external=True, _scheme='https')
+        logger.info(f"Redirect URI: {redirect_uri}")
+        
+        client = Client()
         authorize_url = client.authorization_url(
             client_id=client_id,
             redirect_uri=redirect_uri,
@@ -92,9 +86,13 @@ def strava_auth():
         )
         logger.info(f"Strava authorization URL: {authorize_url}")
         return redirect(authorize_url)
+    except KeyError as e:
+        logger.error(f"Missing Strava credentials: {str(e)}")
+        flash('Missing Strava credentials. Please contact the administrator.', 'error')
+        return redirect(url_for('index'))
     except Exception as e:
-        logger.error(f"Error generating Strava authorization URL: {str(e)}")
-        flash('Error connecting to Strava. Please try again later.', 'error')
+        logger.error(f"Error in Strava authorization: {str(e)}")
+        flash('Error initiating Strava authorization. Please try again.', 'error')
         return redirect(url_for('index'))
 
 @app.route('/strava_callback')
