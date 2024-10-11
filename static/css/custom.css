@@ -10,14 +10,17 @@ body {
 }
 
 .month-labels {
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: repeat(53, 1fr);
     margin-left: 30px;
+    gap: 3px;
 }
 
 .month-label {
     font-size: 0.8em;
     color: var(--bs-secondary);
+    grid-row: 1;
+    text-align: left;
 }
 
 .day-labels {
@@ -26,15 +29,15 @@ body {
     gap: 0;
     position: absolute;
     left: 0;
-    top: 22px; /* Align with the first row of squares */
-    width: 30px; /* Fixed width for day labels */
+    top: 22px;
+    width: 30px;
 }
 
 .day-label {
     font-size: 0.8em;
     color: var(--bs-secondary);
-    height: 36px; /* Height of 3 calendar squares (3 * 10px) + 2 gaps (2 * 3px) */
-    line-height: 36px; /* Vertically center the text */
+    height: 39px;
+    line-height: 39px;
     text-align: right;
     padding-right: 5px;
 }
@@ -42,6 +45,7 @@ body {
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(53, 1fr);
+    grid-template-rows: repeat(7, 1fr);
     gap: 3px;
     margin-left: 30px;
 }

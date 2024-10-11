@@ -4,8 +4,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createCalendar(data) {
         const today = new Date();
-        const startDate = new Date(today.getFullYear(), today.getMonth() - 11, 1);
         const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        const startDate = new Date(endDate);
+        startDate.setMonth(startDate.getMonth() - 11);
+        startDate.setDate(1);
+
+        // Ensure startDate is a Monday
+        while (startDate.getDay() !== 1) {
+            startDate.setDate(startDate.getDate() - 1);
+        }
 
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const days = ['Mon', 'Wed', 'Fri'];
@@ -14,9 +21,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add month labels
         html += '<div class="month-labels">';
-        for (let i = 0; i < 12; i++) {
-            const month = new Date(startDate.getFullYear(), startDate.getMonth() + i, 1);
-            html += `<div class="month-label">${months[month.getMonth()]}</div>`;
+        let currentMonth = new Date(startDate);
+        while (currentMonth <= endDate) {
+            if (currentMonth.getDate() === 1) {
+                const monthIndex = currentMonth.getMonth();
+                html += `<div class="month-label" style="grid-column-start: ${Math.floor((currentMonth - startDate) / (24 * 60 * 60 * 1000) / 7) + 1}">${months[monthIndex]}</div>`;
+            }
+            currentMonth.setDate(currentMonth.getDate() + 1);
         }
         html += '</div>';
 
@@ -31,17 +42,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add calendar squares
         html += '<div class="calendar-grid">';
         let currentDate = new Date(startDate);
-        
-        // Adjust the start date to begin on a Monday
-        while (currentDate.getDay() !== 1) {
-            currentDate.setDate(currentDate.getDate() - 1);
-        }
+        let weekCount = 0;
         
         while (currentDate <= endDate) {
             const dateString = currentDate.toISOString().split('T')[0];
             const duration = data[dateString] || 0;
             const intensity = getIntensity(duration);
-            html += `<div class="calendar-day intensity-${intensity}" data-date="${dateString}" data-duration="${duration}"></div>`;
+            html += `<div class="calendar-day intensity-${intensity}" data-date="${dateString}" data-duration="${duration}" style="grid-row: ${(currentDate.getDay() - 1) % 7 + 1}; grid-column: ${weekCount + 1};"></div>`;
+            
+            if (currentDate.getDay() === 0) {
+                weekCount++;
+            }
+            
             currentDate.setDate(currentDate.getDate() + 1);
         }
         html += '</div>';
