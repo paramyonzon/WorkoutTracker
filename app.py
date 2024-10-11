@@ -28,8 +28,12 @@ login_manager.login_view = 'login'
 with app.app_context():
     import models
 
+# Import routes after app and db are initialized
 from routes import *
 
 @login_manager.user_loader
 def load_user(user_id):
     return models.User.query.get(int(user_id))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
