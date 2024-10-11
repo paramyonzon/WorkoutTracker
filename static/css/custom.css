@@ -21,9 +21,10 @@ body {
 .day-labels {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 14px;
     float: left;
     padding-right: 5px;
+    margin-top: 22px;
 }
 
 .day-label {

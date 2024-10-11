@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const days = ['Mon', 'Wed', 'Fri'];
 
         let html = '<div class="calendar-wrapper">';
         
