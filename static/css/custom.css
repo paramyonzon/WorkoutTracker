@@ -15,6 +15,7 @@ body {
     margin-left: 30px;
     gap: 3px;
     height: 20px;
+    padding-left: 10px; /* Add left padding to align with the first day of each month */
 }
 
 .month-label {
@@ -44,7 +45,8 @@ body {
     color: var(--bs-secondary);
     text-align: right;
     padding-right: 5px;
-    height: 23px; /* Height of three calendar squares plus two gaps */
+    height: 13px; /* Adjust height to match the calendar grid cell height */
+    line-height: 13px; /* Set line-height to match the height */
     display: flex;
     align-items: center;
     justify-content: flex-end;

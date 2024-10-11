@@ -4,6 +4,7 @@ from app import app, db
 from models import User, Workout
 from datetime import datetime, timedelta
 from sqlalchemy import func
+import calendar
 
 @app.route('/')
 @login_required
@@ -120,3 +121,35 @@ def get_workout_progress():
             'total_duration': total_duration
         })
     return jsonify(progress_data)
+
+@app.route('/api/weekly_workouts', methods=['GET'])
+@login_required
+def get_weekly_workouts():
+    end_date = datetime.utcnow().date()
+    start_date = end_date - timedelta(days=365)  # Last year's data
+    
+    weekly_workouts = db.session.query(
+        func.date_trunc('week', Workout.date).label('week'),
+        func.sum(Workout.duration).label('total_duration')
+    ).filter(
+        Workout.user_id == current_user.id,
+        Workout.date >= start_date,
+        Workout.date <= end_date
+    ).group_by(func.date_trunc('week', Workout.date)).order_by(func.date_trunc('week', Workout.date)).all()
+    
+    return jsonify([
+        {
+            'week': week.strftime('%Y-%m-%d'),
+            'total_duration': total_duration
+        } for week, total_duration in weekly_workouts
+    ])
+
+@app.route('/api/exercise_type_distribution', methods=['GET'])
+@login_required
+def get_exercise_type_distribution():
+    distribution = db.session.query(
+        Workout.exercise_type,
+        func.count(Workout.id).label('count')
+    ).filter(Workout.user_id == current_user.id).group_by(Workout.exercise_type).all()
+    
+    return jsonify({exercise_type: count for exercise_type, count in distribution})

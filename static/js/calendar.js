@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '<div class="calendar-content">';
         html += '<div class="day-labels">';
         days.forEach((day, index) => {
-            html += `<div class="day-label" style="grid-row: ${index * 2 + 1} / span 2;">${day}</div>`;
+            html += `<div class="day-label" style="grid-row: ${index * 2 + 1} / span 3;">${day}</div>`;
         });
         html += '</div>';
 
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const dateString = currentDate.toISOString().split('T')[0];
             const duration = data[dateString] || 0;
             const intensity = getIntensity(duration);
-            html += `<div class="calendar-day intensity-${intensity}" data-date="${dateString}" data-duration="${duration}" style="grid-row: ${(currentDate.getDay() - 1) % 7 + 1}; grid-column: ${weekCount + 1};"></div>`;
+            html += `<div class="calendar-day intensity-${intensity}" data-date="${dateString}" data-duration="${duration}" style="grid-row: ${currentDate.getDay() || 7}; grid-column: ${weekCount + 1};"></div>`;
             
             if (currentDate.getDay() === 0) {
                 weekCount++;
