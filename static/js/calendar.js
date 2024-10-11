@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         html += '</div>';
 
-        // Add day labels
+        // Add day labels and calendar grid
+        html += '<div class="calendar-content">';
         html += '<div class="day-labels">';
         days.forEach(day => {
             html += `<div class="day-label">${day}</div>`;
@@ -37,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
             html += `<div class="calendar-day intensity-${intensity}" data-date="${dateString}" data-duration="${duration}"></div>`;
             currentDate.setDate(currentDate.getDate() + 1);
         }
+        html += '</div>';
         html += '</div>';
 
         // Add legend

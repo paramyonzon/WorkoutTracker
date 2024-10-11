@@ -11,6 +11,7 @@ body {
 .month-labels {
     display: flex;
     justify-content: space-around;
+    margin-left: 30px; /* Add left margin to align with calendar grid */
 }
 
 .month-label {
@@ -21,23 +22,27 @@ body {
 .day-labels {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 0;
     float: left;
     padding-right: 5px;
     margin-top: 22px;
+    position: absolute;
+    left: 0;
 }
 
 .day-label {
     font-size: 0.8em;
     color: var(--bs-secondary);
-    height: 10px;
-    line-height: 10px;
+    height: 38px; /* Increased height to match 3 calendar squares + 2 gaps */
+    line-height: 38px;
+    text-align: right;
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(53, 1fr);
     gap: 2px;
+    margin-left: 30px; /* Add left margin for day labels */
 }
 
 .calendar-day {
