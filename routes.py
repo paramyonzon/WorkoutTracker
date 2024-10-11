@@ -10,8 +10,7 @@ import os
 import logging
 import requests
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -70,7 +69,6 @@ def strava_auth():
         client_secret = os.environ['STRAVA_CLIENT_SECRET']
         logger.info(f"Strava credentials loaded: Client ID: {client_id}, Client Secret: {'*' * len(client_secret)}")
         
-        # Ensure client_id is an integer
         try:
             client_id = int(client_id)
         except ValueError:
@@ -84,13 +82,20 @@ def strava_auth():
         return redirect(url_for('index'))
 
     redirect_uri = url_for('strava_callback', _external=True, _scheme='https')
-    authorize_url = client.authorization_url(
-        client_id=client_id,
-        redirect_uri=redirect_uri,
-        scope=['read_all', 'activity:read_all']
-    )
-    logger.info(f"Strava authorization URL: {authorize_url}")
-    return redirect(authorize_url)
+    logger.info(f"Redirect URI: {redirect_uri}")
+    
+    try:
+        authorize_url = client.authorization_url(
+            client_id=client_id,
+            redirect_uri=redirect_uri,
+            scope=['read_all', 'activity:read_all']
+        )
+        logger.info(f"Strava authorization URL: {authorize_url}")
+        return redirect(authorize_url)
+    except Exception as e:
+        logger.error(f"Error generating Strava authorization URL: {str(e)}")
+        flash('Error connecting to Strava. Please try again later.', 'error')
+        return redirect(url_for('index'))
 
 @app.route('/strava_callback')
 @login_required
@@ -130,7 +135,6 @@ def import_strava_activities():
     client = Client(access_token=current_user.strava_access_token)
     
     try:
-        # Check if token is expired and refresh if necessary
         if datetime.utcnow() > current_user.strava_token_expiration:
             refresh_response = client.refresh_access_token(
                 client_id=int(os.environ['STRAVA_CLIENT_ID']),
@@ -182,7 +186,6 @@ def get_workouts():
 def get_stats():
     total_workouts = Workout.query.filter_by(user_id=current_user.id).count()
     
-    # Calculate current streak
     workouts = Workout.query.filter_by(user_id=current_user.id).order_by(Workout.date.desc()).all()
     current_streak = 0
     for i, workout in enumerate(workouts):
@@ -191,7 +194,6 @@ def get_stats():
         else:
             break
     
-    # Find most active day
     most_active_day = db.session.query(
         Workout.date,
         func.sum(Workout.duration).label('total_duration')
