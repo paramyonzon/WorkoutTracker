@@ -39,6 +39,19 @@
 
 <div class="row mt-4">
     <div class="col-12">
+        <h2>Strava Integration</h2>
+        {% if strava_connected %}
+        <p>Your Strava account is connected.</p>
+        <a href="{{ url_for('import_strava_activities') }}" class="btn btn-primary">Import Strava Activities</a>
+        {% else %}
+        <p>Connect your Strava account to import your activities.</p>
+        <a href="{{ url_for('strava_auth') }}" class="btn btn-primary">Connect Strava</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
         <h2>Workout Progress</h2>
         <canvas id="workoutProgressChart"></canvas>
     </div>
