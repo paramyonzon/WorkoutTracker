@@ -2,14 +2,78 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-#workoutCalendar {
-    height: 200px;
+.calendar-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-@media (min-width: 768px) {
-    #workoutCalendar {
-        height: 300px;
-    }
+.month-labels {
+    display: flex;
+    justify-content: space-around;
+}
+
+.month-label {
+    font-size: 0.8em;
+    color: var(--bs-secondary);
+}
+
+.day-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    float: left;
+    padding-right: 5px;
+}
+
+.day-label {
+    font-size: 0.8em;
+    color: var(--bs-secondary);
+    height: 10px;
+    line-height: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(53, 1fr);
+    gap: 2px;
+}
+
+.calendar-day {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.intensity-0 { background-color: var(--bs-dark); }
+.intensity-1 { background-color: var(--bs-success-text); }
+.intensity-2 { background-color: var(--bs-success); }
+.intensity-3 { background-color: var(--bs-success-emphasis); }
+.intensity-4 { background-color: var(--bs-success-bg-subtle); }
+
+.calendar-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.legend-item {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.calendar-tooltip {
+    position: absolute;
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    pointer-events: none;
+    z-index: 1000;
 }
 
 #stats {
@@ -19,7 +83,7 @@ body {
 }
 
 #stats div {
-    font-size: 1.1em;
+    margin-bottom: 10px;
 }
 
 .form-control, .btn {

@@ -30,14 +30,17 @@ def get_stats():
     total_workouts = Workout.query.count()
     
     current_streak = 0
-    last_workout_date = Workout.query.order_by(Workout.date.desc()).first().date
-    current_date = datetime.utcnow().date()
+    last_workout = Workout.query.order_by(Workout.date.desc()).first()
     
-    while last_workout_date >= current_date - timedelta(days=current_streak):
-        if Workout.query.filter(Workout.date == current_date - timedelta(days=current_streak)).first():
-            current_streak += 1
-        else:
-            break
+    if last_workout:
+        last_workout_date = last_workout.date
+        current_date = datetime.utcnow().date()
+        
+        while last_workout_date >= current_date - timedelta(days=current_streak):
+            if Workout.query.filter(Workout.date == current_date - timedelta(days=current_streak)).first():
+                current_streak += 1
+            else:
+                break
     
     most_active_day = db.session.query(
         Workout.date,
