@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add calendar squares
         html += '<div class="calendar-grid">';
         let currentDate = new Date(startDate);
+        
+        // Adjust the start date to begin on a Monday
+        while (currentDate.getDay() !== 1) {
+            currentDate.setDate(currentDate.getDate() - 1);
+        }
+        
         while (currentDate <= endDate) {
             const dateString = currentDate.toISOString().split('T')[0];
             const duration = data[dateString] || 0;
