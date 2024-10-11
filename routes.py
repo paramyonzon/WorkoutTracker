@@ -106,3 +106,17 @@ def get_stats():
         'current_streak': current_streak,
         'most_active_day': most_active_day[0].isoformat() if most_active_day else None
     })
+
+@app.route('/api/workout_progress', methods=['GET'])
+@login_required
+def get_workout_progress():
+    workouts = current_user.workouts.order_by(Workout.date).all()
+    progress_data = []
+    total_duration = 0
+    for workout in workouts:
+        total_duration += workout.duration
+        progress_data.append({
+            'date': workout.date.isoformat(),
+            'total_duration': total_duration
+        })
+    return jsonify(progress_data)

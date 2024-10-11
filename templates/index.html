@@ -36,8 +36,16 @@
         </div>
     </div>
 </div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h2>Workout Progress</h2>
+        <canvas id="workoutProgressChart"></canvas>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/workout_progress.js') }}"></script>
 {% endblock %}
