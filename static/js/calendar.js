@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add day labels and calendar grid
         html += '<div class="calendar-content">';
         html += '<div class="day-labels">';
-        days.forEach(day => {
-            html += `<div class="day-label">${day}</div>`;
+        days.forEach((day, index) => {
+            html += `<div class="day-label" style="grid-row: ${index * 2 + 1} / span 2;">${day}</div>`;
         });
         html += '</div>';
 
