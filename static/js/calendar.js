@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
         while (currentMonth <= endDate) {
             if (currentMonth.getDate() === 1) {
                 const monthIndex = currentMonth.getMonth();
-                html += `<div class="month-label" style="grid-column-start: ${Math.floor((currentMonth - startDate) / (24 * 60 * 60 * 1000) / 7) + 1}">${months[monthIndex]}</div>`;
+                const columnStart = Math.floor((currentMonth - startDate) / (24 * 60 * 60 * 1000) / 7) + 1;
+                html += `<div class="month-label" style="grid-column: ${columnStart} / span 4;">${months[monthIndex]}</div>`;
             }
             currentMonth.setDate(currentMonth.getDate() + 1);
         }
