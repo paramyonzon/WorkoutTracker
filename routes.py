@@ -5,6 +5,9 @@ from strava_utils import get_strava_auth_url, exchange_code_for_token, refresh_a
 from data_processing import process_activities
 from datetime import datetime, timedelta
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 @app.route('/')
 def index():
@@ -14,20 +17,24 @@ def index():
 def calendar():
     user = User.query.first()
     if not user or not user.strava_access_token:
+        logger.info("No user or Strava access token found")
         return render_template('calendar.html', activity_data=json.dumps({}))
     
     activities = Activity.query.all()
     activity_data = {activity.date.isoformat(): activity.activity_level for activity in activities}
+    logger.info(f"Rendering calendar with {len(activity_data)} activities")
     return render_template('calendar.html', activity_data=json.dumps(activity_data))
 
 @app.route('/strava_auth')
 def strava_auth():
     auth_url = get_strava_auth_url()
+    logger.info(f"Redirecting to Strava auth URL: {auth_url}")
     return redirect(auth_url)
 
 @app.route('/strava_callback')
 def strava_callback():
     code = request.args.get('code')
+    logger.info(f"Received Strava callback with code: {code}")
     token_data = exchange_code_for_token(code)
     
     if token_data:
@@ -35,15 +42,18 @@ def strava_callback():
         if not user:
             user = User()
             db.session.add(user)
+            logger.info("Created new user")
         
         user.strava_access_token = token_data['access_token']
         user.strava_refresh_token = token_data['refresh_token']
         user.strava_token_expiry = datetime.fromtimestamp(token_data['expires_at'])
         db.session.commit()
+        logger.info("Updated user with new Strava tokens")
         
         fetch_and_process_activities()
         flash('Strava account connected successfully!', 'success')
     else:
+        logger.error("Failed to connect Strava account")
         flash('Failed to connect Strava account.', 'error')
     
     return redirect(url_for('calendar'))
@@ -64,31 +74,38 @@ def activity_details(date):
             user = User.query.first()
             strava_activities = fetch_strava_activities(user.strava_access_token, after=activity_date, before=activity_date + timedelta(days=1))
             activity_names = [a['type'] for a in strava_activities]
+            logger.info(f"Fetched {len(activity_names)} activities for {date}")
             return jsonify({
                 'activity_level': activity.activity_level,
                 'activities': activity_names
             })
         else:
+            logger.info(f"No activity found for {date}")
             return jsonify({
                 'activity_level': 0,
                 'activities': []
             })
     except ValueError:
+        logger.error(f"Invalid date format: {date}")
         return jsonify({'error': 'Invalid date format'}), 400
 
 def fetch_and_process_activities():
     user = User.query.first()
     if not user:
+        logger.error("No user found in the database")
         return
 
     if user.strava_token_expiry and user.strava_token_expiry <= datetime.now():
+        logger.info("Refreshing expired Strava token")
         token_data = refresh_access_token(user.strava_refresh_token)
         if token_data:
             user.strava_access_token = token_data['access_token']
             user.strava_refresh_token = token_data['refresh_token']
             user.strava_token_expiry = datetime.fromtimestamp(token_data['expires_at'])
             db.session.commit()
+            logger.info("Successfully refreshed Strava token")
         else:
+            logger.error("Failed to refresh Strava token")
             flash('Failed to refresh Strava token.', 'error')
             return
     
@@ -104,3 +121,4 @@ def fetch_and_process_activities():
             db.session.add(new_activity)
     
     db.session.commit()
+    logger.info(f"Processed and saved {len(processed_activities)} activities")
