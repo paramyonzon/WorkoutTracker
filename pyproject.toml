@@ -11,4 +11,7 @@ dependencies = [
     "flask-login>=0.6.3",
     "stravalib>=2.0",
     "flask-migrate>=4.0.7",
+    "requests>=2.32.3",
+    "sqlalchemy>=2.0.35",
+    "werkzeug>=3.0.4",
 ]

@@ -23,8 +23,11 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
+            logger.info(f"User {username} logged in successfully")
             return redirect(url_for('index'))
-        flash('Invalid username or password')
+        else:
+            logger.warning(f"Failed login attempt for user {username}")
+            flash('Invalid username or password', 'error')
     return render_template('login.html')
 
 @app.route('/logout')

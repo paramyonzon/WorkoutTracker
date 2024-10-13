@@ -139,7 +139,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('addWorkoutForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        // ... (existing code for adding a workout)
+        const date = document.getElementById('date').value;
+        const duration = parseInt(document.getElementById('duration').value);
+        const exerciseType = document.getElementById('exerciseType').value;
+
+        fetch('/api/add_workout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ date, duration, exercise_type: exerciseType }),
+        })
+        .then(response => response.json())
         .then(() => {
             fetchWorkoutProgress();
             fetchWeeklyWorkouts();

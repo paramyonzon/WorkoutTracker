@@ -517,7 +517,10 @@ dependencies = [
     { name = "flask-migrate" },
     { name = "flask-sqlalchemy" },
     { name = "psycopg2-binary" },
+    { name = "requests" },
+    { name = "sqlalchemy" },
     { name = "stravalib" },
+    { name = "werkzeug" },
 ]
 
 [package.metadata]
@@ -528,7 +531,10 @@ requires-dist = [
     { name = "flask-migrate", specifier = ">=4.0.7" },
     { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
     { name = "psycopg2-binary", specifier = ">=2.9.9" },
+    { name = "requests", specifier = ">=2.32.3" },
+    { name = "sqlalchemy", specifier = ">=2.0.35" },
     { name = "stravalib", specifier = ">=2.0" },
+    { name = "werkzeug", specifier = ">=3.0.4" },
 ]
 
 [[package]]
