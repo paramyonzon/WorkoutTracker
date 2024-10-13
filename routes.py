@@ -100,16 +100,26 @@ def refresh_activities():
 @app.route('/activity_details/<date>')
 @login_required
 def activity_details(date):
-    activity = Activity.query.filter_by(user_id=current_user.id, date=date).first()
-    if activity:
-        # Fetch Strava activities for the given date
-        strava_activities = fetch_strava_activities(current_user.strava_access_token, after=activity.date, before=activity.date + timedelta(days=1))
-        activity_names = [a['type'] for a in strava_activities]
-        return jsonify({
-            'activity_level': activity.activity_level,
-            'activities': activity_names
-        })
-    return jsonify({'error': 'No activity found for this date'}), 404
+    try:
+        activity_date = datetime.strptime(date, '%Y-%m-%d').date()
+        activity = Activity.query.filter_by(user_id=current_user.id, date=activity_date).first()
+        
+        if activity:
+            # Fetch Strava activities for the given date
+            strava_activities = fetch_strava_activities(current_user.strava_access_token, after=activity_date, before=activity_date + timedelta(days=1))
+            activity_names = [a['type'] for a in strava_activities]
+            return jsonify({
+                'activity_level': activity.activity_level,
+                'activities': activity_names
+            })
+        else:
+            # Return a default response when no activity is found
+            return jsonify({
+                'activity_level': 0,
+                'activities': []
+            })
+    except ValueError:
+        return jsonify({'error': 'Invalid date format'}), 400
 
 def fetch_and_process_activities():
     if current_user.strava_token_expiry and current_user.strava_token_expiry <= datetime.now():

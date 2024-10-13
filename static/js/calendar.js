@@ -74,11 +74,16 @@ function showActivityDetails(date, element, isPermanent = false) {
         .then(data => {
             const tooltip = document.createElement('div');
             tooltip.classList.add('activity-tooltip');
-            tooltip.innerHTML = `
-                <strong>Date:</strong> ${date}<br>
-                <strong>Activity Level:</strong> ${(data.activity_level * 100).toFixed(2)}%<br>
-                <strong>Activities:</strong> ${data.activities.join(', ')}
-            `;
+            
+            if (data.error) {
+                tooltip.innerHTML = `<strong>Error:</strong> ${data.error}`;
+            } else {
+                tooltip.innerHTML = `
+                    <strong>Date:</strong> ${date}<br>
+                    <strong>Activity Level:</strong> ${(data.activity_level * 100).toFixed(2)}%<br>
+                    <strong>Activities:</strong> ${data.activities.length > 0 ? data.activities.join(', ') : 'No activities recorded'}
+                `;
+            }
 
             // Position the tooltip
             const rect = element.getBoundingClientRect();
@@ -104,5 +109,11 @@ function showActivityDetails(date, element, isPermanent = false) {
                 });
             }
         })
-        .catch(error => console.error('Error fetching activity details:', error));
+        .catch(error => {
+            console.error('Error fetching activity details:', error);
+            const tooltip = document.createElement('div');
+            tooltip.classList.add('activity-tooltip');
+            tooltip.innerHTML = '<strong>Error:</strong> Failed to fetch activity details';
+            document.body.appendChild(tooltip);
+        });
 }
