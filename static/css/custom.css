@@ -1,4 +1,51 @@
-/* Add any custom styles here if needed */
+/* Custom styles for the Strava Calendar app */
+
 body {
     padding-bottom: 20px;
+}
+
+.calendar-container {
+    background-color: var(--bs-dark);
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.month-labels {
+    color: var(--bs-secondary);
+    font-size: 0.8rem;
+}
+
+.weekday-labels {
+    color: var(--bs-secondary);
+    font-size: 0.8rem;
+}
+
+.calendar-day {
+    transition: transform 0.1s ease-in-out;
+}
+
+.calendar-day:hover {
+    transform: scale(1.2);
+}
+
+.activity-tooltip {
+    font-size: 0.9rem;
+    max-width: 250px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 10px;
+    }
+
+    .calendar-day {
+        width: 8px;
+        height: 8px;
+    }
+
+    .month-labels, .weekday-labels {
+        font-size: 0.7rem;
+    }
 }

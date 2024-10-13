@@ -1,64 +1,49 @@
 function renderCalendar(activityData) {
     const calendarElement = document.getElementById('calendar');
+    const monthLabelsElement = document.getElementById('month-labels');
     const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth();
+    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
 
     // Clear existing calendar
     calendarElement.innerHTML = '';
+    monthLabelsElement.innerHTML = '';
 
-    // Add day labels
-    const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    dayLabels.forEach(day => {
-        const dayLabel = document.createElement('div');
-        dayLabel.textContent = day;
-        dayLabel.classList.add('calendar-day', 'fw-bold');
-        calendarElement.appendChild(dayLabel);
-    });
-
-    // Get the first day of the month
-    const firstDay = new Date(currentYear, currentMonth, 1);
-    const startingDay = firstDay.getDay();
-
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDay; i++) {
-        const emptyDay = document.createElement('div');
-        emptyDay.classList.add('calendar-day');
-        calendarElement.appendChild(emptyDay);
+    // Generate month labels
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    let currentMonth = oneYearAgo.getMonth();
+    for (let i = 0; i < 12; i++) {
+        const monthLabel = document.createElement('span');
+        monthLabel.textContent = months[(currentMonth + i) % 12];
+        monthLabelsElement.appendChild(monthLabel);
     }
 
-    // Get the number of days in the current month
-    const lastDay = new Date(currentYear, currentMonth + 1, 0);
-    const daysInMonth = lastDay.getDate();
+    // Generate calendar days
+    let currentDate = new Date(oneYearAgo);
+    while (currentDate <= today) {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('calendar-day');
 
-    // Add calendar days
-    for (let day = 1; day <= daysInMonth; day++) {
-        const calendarDay = document.createElement('div');
-        calendarDay.textContent = day;
-        calendarDay.classList.add('calendar-day');
-
-        const currentDate = new Date(currentYear, currentMonth, day);
         const dateString = currentDate.toISOString().split('T')[0];
         const activityLevel = activityData[dateString] || 0;
 
         // Set background color based on activity level
         const bgColor = getColorForActivityLevel(activityLevel);
-        calendarDay.style.backgroundColor = bgColor;
+        dayElement.style.backgroundColor = bgColor;
 
         // Add event listeners for mouseover and click
-        calendarDay.addEventListener('mouseover', () => showActivityDetails(dateString, calendarDay));
-        calendarDay.addEventListener('click', () => showActivityDetails(dateString, calendarDay, true));
+        dayElement.addEventListener('mouseover', () => showActivityDetails(dateString, dayElement));
+        dayElement.addEventListener('click', () => showActivityDetails(dateString, dayElement, true));
 
-        calendarElement.appendChild(calendarDay);
+        calendarElement.appendChild(dayElement);
+        currentDate.setDate(currentDate.getDate() + 1);
     }
 }
 
 function getColorForActivityLevel(level) {
-    // Convert activity level (0-1) to a color scale from light green to dark green
-    const r = Math.round(230 - (level * 230));
-    const g = 255;
-    const b = Math.round(230 - (level * 230));
-    return `rgb(${r}, ${g}, ${b})`;
+    const baseColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-success').trim();
+    const rgb = baseColor.match(/\d+/g).map(Number);
+    const alpha = level * 0.8 + 0.2; // Adjust this formula to get desired color intensity
+    return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
 
 function showActivityDetails(date, element, isPermanent = false) {
@@ -88,14 +73,15 @@ function showActivityDetails(date, element, isPermanent = false) {
             // Position the tooltip
             const rect = element.getBoundingClientRect();
             tooltip.style.position = 'absolute';
-            tooltip.style.top = `${rect.bottom + window.scrollY}px`;
-            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            tooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            tooltip.style.left = `${rect.left + window.scrollX - 100}px`;
             tooltip.style.zIndex = '1000';
             tooltip.style.backgroundColor = 'var(--bs-dark)';
             tooltip.style.color = 'var(--bs-light)';
             tooltip.style.padding = '10px';
             tooltip.style.borderRadius = '5px';
             tooltip.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+            tooltip.style.width = '200px';
 
             document.body.appendChild(tooltip);
 
@@ -107,13 +93,10 @@ function showActivityDetails(date, element, isPermanent = false) {
                     e.stopPropagation();
                     tooltip.remove();
                 });
+                document.addEventListener('click', () => tooltip.remove(), { once: true });
             }
         })
         .catch(error => {
             console.error('Error fetching activity details:', error);
-            const tooltip = document.createElement('div');
-            tooltip.classList.add('activity-tooltip');
-            tooltip.innerHTML = '<strong>Error:</strong> Failed to fetch activity details';
-            document.body.appendChild(tooltip);
         });
 }
