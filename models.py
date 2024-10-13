@@ -1,9 +1,7 @@
 from app import db
-from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     strava_access_token = db.Column(db.String(128))
     strava_refresh_token = db.Column(db.String(128))

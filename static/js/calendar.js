@@ -59,7 +59,12 @@ function showActivityDetails(date, element, isPermanent = false) {
 
     // Fetch activity details
     fetch(`/activity_details/${date}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             const tooltip = document.createElement('div');
             tooltip.classList.add('activity-tooltip');
@@ -102,6 +107,21 @@ function showActivityDetails(date, element, isPermanent = false) {
         })
         .catch(error => {
             console.error('Error fetching activity details:', error);
+            const errorTooltip = document.createElement('div');
+            errorTooltip.classList.add('activity-tooltip');
+            errorTooltip.innerHTML = `<strong>Error:</strong> Failed to fetch activity details. Please try again later.`;
+            errorTooltip.style.position = 'absolute';
+            errorTooltip.style.top = `${element.getBoundingClientRect().bottom + window.scrollY + 5}px`;
+            errorTooltip.style.left = `${element.getBoundingClientRect().left + window.scrollX - 100}px`;
+            errorTooltip.style.zIndex = '1000';
+            errorTooltip.style.backgroundColor = 'var(--bs-danger)';
+            errorTooltip.style.color = 'var(--bs-light)';
+            errorTooltip.style.padding = '10px';
+            errorTooltip.style.borderRadius = '5px';
+            errorTooltip.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+            errorTooltip.style.width = '200px';
+            document.body.appendChild(errorTooltip);
+            setTimeout(() => errorTooltip.remove(), 3000);
         });
 }
 

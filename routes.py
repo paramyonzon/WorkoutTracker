@@ -18,10 +18,6 @@ def calendar():
     user = User.query.first()
     strava_connected = user is not None and user.strava_access_token is not None
     
-    if not strava_connected:
-        logger.warning("No user or Strava access token found")
-        return render_template('calendar.html', activity_data=json.dumps({}), strava_connected=strava_connected)
-    
     activities = Activity.query.all()
     activity_data = {activity.date.isoformat(): activity.activity_level for activity in activities}
     logger.info(f"Rendering calendar with {len(activity_data)} activities")
@@ -84,9 +80,13 @@ def activity_details(date):
         if activity:
             user = User.query.first()
             if user and user.strava_access_token:
-                strava_activities = fetch_strava_activities(user.strava_access_token, after=activity_date, before=activity_date + timedelta(days=1))
-                activity_names = [a['type'] for a in strava_activities]
-                logger.info(f"Fetched {len(activity_names)} activities for {date}")
+                try:
+                    strava_activities = fetch_strava_activities(user.strava_access_token, after=activity_date, before=activity_date + timedelta(days=1))
+                    activity_names = [a['type'] for a in strava_activities]
+                    logger.info(f"Fetched {len(activity_names)} activities for {date}")
+                except Exception as e:
+                    logger.error(f"Error fetching Strava activities: {str(e)}")
+                    return jsonify({'error': 'Failed to fetch Strava activities'}), 500
             else:
                 activity_names = []
                 logger.warning("No user or Strava access token found when fetching activity details")
@@ -103,6 +103,9 @@ def activity_details(date):
     except ValueError:
         logger.error(f"Invalid date format: {date}")
         return jsonify({'error': 'Invalid date format'}), 400
+    except Exception as e:
+        logger.error(f"Unexpected error in activity_details: {str(e)}")
+        return jsonify({'error': 'An unexpected error occurred'}), 500
 
 def fetch_and_process_activities():
     user = User.query.first()
@@ -123,21 +126,25 @@ def fetch_and_process_activities():
             logger.error("Failed to refresh Strava token")
             return False
     
-    activities = fetch_strava_activities(user.strava_access_token)
-    if not activities:
-        logger.error("Failed to fetch Strava activities")
-        return False
+    try:
+        activities = fetch_strava_activities(user.strava_access_token)
+        if not activities:
+            logger.error("Failed to fetch Strava activities")
+            return False
 
-    processed_activities = process_activities(activities)
-    
-    for date, activity_level in processed_activities.items():
-        existing_activity = Activity.query.filter_by(date=date).first()
-        if existing_activity:
-            existing_activity.activity_level = activity_level
-        else:
-            new_activity = Activity(date=date, activity_level=activity_level)
-            db.session.add(new_activity)
-    
-    db.session.commit()
-    logger.info(f"Processed and saved {len(processed_activities)} activities")
-    return True
+        processed_activities = process_activities(activities)
+        
+        for date, activity_level in processed_activities.items():
+            existing_activity = Activity.query.filter_by(date=date).first()
+            if existing_activity:
+                existing_activity.activity_level = activity_level
+            else:
+                new_activity = Activity(date=date, activity_level=activity_level)
+                db.session.add(new_activity)
+        
+        db.session.commit()
+        logger.info(f"Processed and saved {len(processed_activities)} activities")
+        return True
+    except Exception as e:
+        logger.error(f"Error in fetch_and_process_activities: {str(e)}")
+        return False
