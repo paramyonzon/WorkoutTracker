@@ -73,12 +73,12 @@
         <span>More</span>
     </div>
 </div>
+
+<script id="activity-data" type="application/json">
+    {{ activity_data|safe }}
+</script>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
-<script>
-    const activityData = {{ activity_data|safe }};
-    renderCalendar(activityData);
-</script>
 {% endblock %}

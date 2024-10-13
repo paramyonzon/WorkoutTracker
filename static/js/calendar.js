@@ -1,6 +1,10 @@
 function renderCalendar(activityData) {
     const calendarElement = document.getElementById('calendar');
     const monthLabelsElement = document.getElementById('month-labels');
+    if (!calendarElement || !monthLabelsElement) {
+        console.error('Calendar or month labels element not found');
+        return;
+    }
     const today = new Date();
     const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
 
@@ -100,3 +104,14 @@ function showActivityDetails(date, element, isPermanent = false) {
             console.error('Error fetching activity details:', error);
         });
 }
+
+// Initialize the calendar when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const activityDataElement = document.getElementById('activity-data');
+    if (activityDataElement) {
+        const activityData = JSON.parse(activityDataElement.textContent);
+        renderCalendar(activityData);
+    } else {
+        console.error('Activity data element not found');
+    }
+});
