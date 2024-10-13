@@ -39,7 +39,7 @@
 {% block content %}
 <h2 class="mb-4">Activity Calendar</h2>
 
-{% if not activity_data %}
+{% if not strava_connected %}
 <div class="alert alert-info" role="alert">
     Connect your Strava account to see your activity data.
     <a href="{{ url_for('strava_auth') }}" class="btn btn-primary btn-sm ms-2">Connect Strava</a>

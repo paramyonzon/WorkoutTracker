@@ -16,14 +16,16 @@ def index():
 @app.route('/calendar')
 def calendar():
     user = User.query.first()
-    if not user or not user.strava_access_token:
+    strava_connected = user is not None and user.strava_access_token is not None
+    
+    if not strava_connected:
         logger.warning("No user or Strava access token found")
-        return render_template('calendar.html', activity_data=json.dumps({}))
+        return render_template('calendar.html', activity_data=json.dumps({}), strava_connected=strava_connected)
     
     activities = Activity.query.all()
     activity_data = {activity.date.isoformat(): activity.activity_level for activity in activities}
     logger.info(f"Rendering calendar with {len(activity_data)} activities")
-    return render_template('calendar.html', activity_data=json.dumps(activity_data))
+    return render_template('calendar.html', activity_data=json.dumps(activity_data), strava_connected=strava_connected)
 
 @app.route('/strava_auth')
 def strava_auth():
