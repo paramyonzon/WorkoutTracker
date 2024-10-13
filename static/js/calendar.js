@@ -45,6 +45,10 @@ function renderCalendar(activityData) {
         const bgColor = getColorForActivityLevel(activityLevel);
         calendarDay.style.backgroundColor = bgColor;
 
+        // Add event listeners for mouseover and click
+        calendarDay.addEventListener('mouseover', () => showActivityDetails(dateString, calendarDay));
+        calendarDay.addEventListener('click', () => showActivityDetails(dateString, calendarDay, true));
+
         calendarElement.appendChild(calendarDay);
     }
 }
@@ -55,4 +59,50 @@ function getColorForActivityLevel(level) {
     const g = 255;
     const b = Math.round(230 - (level * 230));
     return `rgb(${r}, ${g}, ${b})`;
+}
+
+function showActivityDetails(date, element, isPermanent = false) {
+    // Remove existing tooltips
+    const existingTooltip = document.querySelector('.activity-tooltip');
+    if (existingTooltip) {
+        existingTooltip.remove();
+    }
+
+    // Fetch activity details
+    fetch(`/activity_details/${date}`)
+        .then(response => response.json())
+        .then(data => {
+            const tooltip = document.createElement('div');
+            tooltip.classList.add('activity-tooltip');
+            tooltip.innerHTML = `
+                <strong>Date:</strong> ${date}<br>
+                <strong>Activity Level:</strong> ${(data.activity_level * 100).toFixed(2)}%<br>
+                <strong>Activities:</strong> ${data.activities.join(', ')}
+            `;
+
+            // Position the tooltip
+            const rect = element.getBoundingClientRect();
+            tooltip.style.position = 'absolute';
+            tooltip.style.top = `${rect.bottom + window.scrollY}px`;
+            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            tooltip.style.zIndex = '1000';
+            tooltip.style.backgroundColor = 'var(--bs-dark)';
+            tooltip.style.color = 'var(--bs-light)';
+            tooltip.style.padding = '10px';
+            tooltip.style.borderRadius = '5px';
+            tooltip.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+
+            document.body.appendChild(tooltip);
+
+            if (!isPermanent) {
+                element.addEventListener('mouseout', () => tooltip.remove());
+            } else {
+                tooltip.style.cursor = 'pointer';
+                tooltip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    tooltip.remove();
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching activity details:', error));
 }

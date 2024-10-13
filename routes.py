@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from app import app, db, login_manager
 from models import User, Activity
@@ -96,6 +96,20 @@ def refresh_activities():
     fetch_and_process_activities()
     flash('Activities refreshed successfully!', 'success')
     return redirect(url_for('calendar'))
+
+@app.route('/activity_details/<date>')
+@login_required
+def activity_details(date):
+    activity = Activity.query.filter_by(user_id=current_user.id, date=date).first()
+    if activity:
+        # Fetch Strava activities for the given date
+        strava_activities = fetch_strava_activities(current_user.strava_access_token, after=activity.date, before=activity.date + timedelta(days=1))
+        activity_names = [a['type'] for a in strava_activities]
+        return jsonify({
+            'activity_level': activity.activity_level,
+            'activities': activity_names
+        })
+    return jsonify({'error': 'No activity found for this date'}), 404
 
 def fetch_and_process_activities():
     if current_user.strava_token_expiry and current_user.strava_token_expiry <= datetime.now():

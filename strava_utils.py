@@ -1,6 +1,7 @@
 import os
 import requests
 from urllib.parse import urlencode
+from datetime import datetime
 
 STRAVA_CLIENT_ID = os.environ.get('STRAVA_CLIENT_ID')
 STRAVA_CLIENT_SECRET = os.environ.get('STRAVA_CLIENT_SECRET')
@@ -39,7 +40,13 @@ def refresh_access_token(refresh_token):
     )
     return response.json() if response.status_code == 200 else None
 
-def fetch_strava_activities(access_token):
+def fetch_strava_activities(access_token, after=None, before=None):
     headers = {'Authorization': f'Bearer {access_token}'}
-    response = requests.get('https://www.strava.com/api/v3/athlete/activities', headers=headers)
+    params = {}
+    if after:
+        params['after'] = int(after.timestamp())
+    if before:
+        params['before'] = int(before.timestamp())
+    
+    response = requests.get('https://www.strava.com/api/v3/athlete/activities', headers=headers, params=params)
     return response.json() if response.status_code == 200 else []
