@@ -5,7 +5,7 @@ from datetime import datetime
 
 STRAVA_CLIENT_ID = os.environ.get('STRAVA_CLIENT_ID')
 STRAVA_CLIENT_SECRET = os.environ.get('STRAVA_CLIENT_SECRET')
-REDIRECT_URI = 'http://localhost:5000/strava_callback'
+REDIRECT_URI = os.environ.get('STRAVA_REDIRECT_URI', 'https://your-replit-url.repl.co/strava_callback')
 
 def get_strava_auth_url():
     params = {
