@@ -81,9 +81,13 @@ def activity_details(date):
         
         if activity:
             user = User.query.first()
-            strava_activities = fetch_strava_activities(user.strava_access_token, after=activity_date, before=activity_date + timedelta(days=1))
-            activity_names = [a['type'] for a in strava_activities]
-            logger.info(f"Fetched {len(activity_names)} activities for {date}")
+            if user and user.strava_access_token:
+                strava_activities = fetch_strava_activities(user.strava_access_token, after=activity_date, before=activity_date + timedelta(days=1))
+                activity_names = [a['type'] for a in strava_activities]
+                logger.info(f"Fetched {len(activity_names)} activities for {date}")
+            else:
+                activity_names = []
+                logger.warning("No user or Strava access token found when fetching activity details")
             return jsonify({
                 'activity_level': activity.activity_level,
                 'activities': activity_names
