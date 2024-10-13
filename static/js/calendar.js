@@ -45,9 +45,9 @@ function renderCalendar(activityData) {
 
 function getColorForActivityLevel(level) {
     if (level === 0) return '#ebedf0';  // Very light grey for no activity
-    if (level <= 0.25) return '#9be9a8';  // Light green
-    if (level <= 0.5) return '#40c463';  // Medium green
-    if (level <= 0.75) return '#30a14e';  // Dark green
+    if (level <= 25) return '#9be9a8';  // Light green
+    if (level <= 50) return '#40c463';  // Medium green
+    if (level <= 75) return '#30a14e';  // Dark green
     return '#216e39';  // Very dark green for high activity
 }
 
@@ -75,7 +75,7 @@ function showActivityDetails(date, element, isPermanent = false) {
             } else {
                 tooltip.innerHTML = `
                     <strong>Date:</strong> ${date}<br>
-                    <strong>Activity Level:</strong> ${(data.activity_level * 100).toFixed(2)}%<br>
+                    <strong>Activity Level:</strong> ${data.activity_level.toFixed(2)}%<br>
                     <strong>Activities:</strong> ${data.activities.length > 0 ? data.activities.join(', ') : 'No activities recorded'}
                 `;
             }

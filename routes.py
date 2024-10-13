@@ -1,5 +1,5 @@
 from flask import render_template, jsonify
-from app import app
+from app import app, db
 from models import Activity
 from strava_utils import fetch_strava_activities, ATHLETE_ID
 from data_processing import process_activities
@@ -62,9 +62,9 @@ def fetch_and_process_activities():
                 existing_activity.activity_level = activity_level
             else:
                 new_activity = Activity(date=date, activity_level=activity_level)
-                app.db.session.add(new_activity)
+                db.session.add(new_activity)
         
-        app.db.session.commit()
+        db.session.commit()
         logger.info(f"Processed and saved {len(processed_activities)} activities")
         return True
     except Exception as e:

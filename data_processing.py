@@ -13,8 +13,11 @@ def process_activities(activities):
     daily_activity = df.groupby('date')['moving_time'].sum().reset_index()
     daily_activity['activity_level'] = daily_activity['moving_time'].dt.total_seconds() / 3600  # Convert to hours
 
-    # Normalize activity levels to a 0-1 scale
-    max_activity = daily_activity['activity_level'].max()
-    daily_activity['activity_level'] = daily_activity['activity_level'] / max_activity
+    # Calculate the maximum activity level for each year
+    daily_activity['year'] = daily_activity['date'].dt.year
+    yearly_max = daily_activity.groupby('year')['activity_level'].transform('max')
+
+    # Calculate activity levels as a percentage of the maximum for each year
+    daily_activity['activity_level'] = (daily_activity['activity_level'] / yearly_max) * 100
 
     return dict(zip(daily_activity['date'].astype(str), daily_activity['activity_level']))

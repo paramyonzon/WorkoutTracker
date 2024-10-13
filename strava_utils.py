@@ -45,7 +45,7 @@ def fetch_strava_activities(after=None, before=None):
             return []
 
     headers = {'Authorization': f'Bearer {access_token}'}
-    params = {'per_page': 200}
+    params = {'per_page': 200, 'athlete_id': ATHLETE_ID}
     if after:
         params['after'] = int(after.timestamp())
     if before:
