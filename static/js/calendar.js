@@ -44,11 +44,11 @@ function renderCalendar(activityData) {
 }
 
 function getColorForActivityLevel(level) {
-    if (level === 0) return 'var(--bs-secondary-bg)';
-    if (level <= 0.25) return 'var(--bs-success-text)';
-    if (level <= 0.5) return 'var(--bs-success)';
-    if (level <= 0.75) return 'var(--bs-success-bg-subtle)';
-    return 'var(--bs-success-border-subtle)';
+    if (level === 0) return '#ebedf0';  // Very light grey for no activity
+    if (level <= 0.25) return '#9be9a8';  // Light green
+    if (level <= 0.5) return '#40c463';  // Medium green
+    if (level <= 0.75) return '#30a14e';  // Dark green
+    return '#216e39';  // Very dark green for high activity
 }
 
 function showActivityDetails(date, element, isPermanent = false) {
