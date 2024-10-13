@@ -1,18 +1,13 @@
+from flask_migrate import Migrate
 from app import app, db
-from flask_migrate import upgrade, migrate, init, stamp
-from flask.cli import with_appcontext
+from models import User
 
-@with_appcontext
-def create_migration():
-    migrate(message="Add Strava fields to User and Workout models")
+migrate = Migrate(app, db)
 
-@with_appcontext
-def apply_migration():
-    upgrade()
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     with app.app_context():
-        init()  # Initialize migrations if not already done
-        create_migration()
-        apply_migration()
-    print("Migration created and applied successfully.")
+        migrate.init_app(app, db)
+        migrate.migrate()
+        migrate.upgrade()
+
+    print("Migration completed successfully.")
