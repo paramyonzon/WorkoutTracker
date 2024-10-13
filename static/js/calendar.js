@@ -44,10 +44,11 @@ function renderCalendar(activityData) {
 }
 
 function getColorForActivityLevel(level) {
-    const baseColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-success').trim();
-    const rgb = baseColor.match(/\d+/g).map(Number);
-    const alpha = level * 0.8 + 0.2; // Adjust this formula to get desired color intensity
-    return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+    if (level === 0) return 'var(--bs-secondary-bg)';
+    if (level <= 0.25) return 'var(--bs-success-text)';
+    if (level <= 0.5) return 'var(--bs-success)';
+    if (level <= 0.75) return 'var(--bs-success-bg-subtle)';
+    return 'var(--bs-success-border-subtle)';
 }
 
 function showActivityDetails(date, element, isPermanent = false) {
@@ -91,6 +92,7 @@ function showActivityDetails(date, element, isPermanent = false) {
             tooltip.style.borderRadius = '5px';
             tooltip.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
             tooltip.style.width = '200px';
+            tooltip.style.fontSize = '12px';
 
             document.body.appendChild(tooltip);
 
@@ -107,21 +109,6 @@ function showActivityDetails(date, element, isPermanent = false) {
         })
         .catch(error => {
             console.error('Error fetching activity details:', error);
-            const errorTooltip = document.createElement('div');
-            errorTooltip.classList.add('activity-tooltip');
-            errorTooltip.innerHTML = `<strong>Error:</strong> Failed to fetch activity details. Please try again later.`;
-            errorTooltip.style.position = 'absolute';
-            errorTooltip.style.top = `${element.getBoundingClientRect().bottom + window.scrollY + 5}px`;
-            errorTooltip.style.left = `${element.getBoundingClientRect().left + window.scrollX - 100}px`;
-            errorTooltip.style.zIndex = '1000';
-            errorTooltip.style.backgroundColor = 'var(--bs-danger)';
-            errorTooltip.style.color = 'var(--bs-light)';
-            errorTooltip.style.padding = '10px';
-            errorTooltip.style.borderRadius = '5px';
-            errorTooltip.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
-            errorTooltip.style.width = '200px';
-            document.body.appendChild(errorTooltip);
-            setTimeout(() => errorTooltip.remove(), 3000);
         });
 }
 
