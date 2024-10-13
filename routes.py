@@ -17,7 +17,7 @@ def index():
 def calendar():
     user = User.query.first()
     if not user or not user.strava_access_token:
-        logger.info("No user or Strava access token found")
+        logger.warning("No user or Strava access token found")
         return render_template('calendar.html', activity_data=json.dumps({}))
     
     activities = Activity.query.all()
@@ -33,6 +33,12 @@ def strava_auth():
 
 @app.route('/strava_callback')
 def strava_callback():
+    error = request.args.get('error')
+    if error:
+        logger.error(f"Strava authentication error: {error}")
+        flash(f'Strava authentication failed: {error}', 'error')
+        return redirect(url_for('calendar'))
+
     code = request.args.get('code')
     logger.info(f"Received Strava callback with code: {code}")
     token_data = exchange_code_for_token(code)
@@ -54,14 +60,17 @@ def strava_callback():
         flash('Strava account connected successfully!', 'success')
     else:
         logger.error("Failed to connect Strava account")
-        flash('Failed to connect Strava account.', 'error')
+        flash('Failed to connect Strava account. Please try again.', 'error')
     
     return redirect(url_for('calendar'))
 
 @app.route('/refresh_activities')
 def refresh_activities():
-    fetch_and_process_activities()
-    flash('Activities refreshed successfully!', 'success')
+    result = fetch_and_process_activities()
+    if result:
+        flash('Activities refreshed successfully!', 'success')
+    else:
+        flash('Failed to refresh activities. Please try reconnecting your Strava account.', 'error')
     return redirect(url_for('calendar'))
 
 @app.route('/activity_details/<date>')
@@ -93,7 +102,7 @@ def fetch_and_process_activities():
     user = User.query.first()
     if not user:
         logger.error("No user found in the database")
-        return
+        return False
 
     if user.strava_token_expiry and user.strava_token_expiry <= datetime.now():
         logger.info("Refreshing expired Strava token")
@@ -106,10 +115,13 @@ def fetch_and_process_activities():
             logger.info("Successfully refreshed Strava token")
         else:
             logger.error("Failed to refresh Strava token")
-            flash('Failed to refresh Strava token.', 'error')
-            return
+            return False
     
     activities = fetch_strava_activities(user.strava_access_token)
+    if not activities:
+        logger.error("Failed to fetch Strava activities")
+        return False
+
     processed_activities = process_activities(activities)
     
     for date, activity_level in processed_activities.items():
@@ -122,3 +134,4 @@ def fetch_and_process_activities():
     
     db.session.commit()
     logger.info(f"Processed and saved {len(processed_activities)} activities")
+    return True
