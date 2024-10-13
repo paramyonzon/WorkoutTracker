@@ -1,13 +1,12 @@
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from app import app, db
-from models import User
+from models import User, Activity
 
 migrate = Migrate(app, db)
 
 if __name__ == '__main__':
     with app.app_context():
         migrate.init_app(app, db)
-        migrate.migrate()
-        migrate.upgrade()
+        upgrade()
 
     print("Migration completed successfully.")
